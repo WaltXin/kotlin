@@ -23,7 +23,7 @@ fun <S> test(i: Int, s: S) {
     takeInvInt(create(i))
 }
 
-// -----
+// Various contexts for def not null discarding
 
 class Foo<T>(x: T)
 class Bar<S>
@@ -168,7 +168,7 @@ fun <L> main(x: L?, y: L) {
     val x190: L = foo19(<!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     val x191: L = foo19(<!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
 
-    // with expected type and receiver
+    // with expected type and receiver (it shouldn't work)
     val x200: L = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo19<!>()
     val x201: L = <!DEBUG_INFO_EXPRESSION_TYPE("Type is unknown")!><!NEW_INFERENCE_NO_INFORMATION_FOR_PARAMETER!>Bar<!>()<!>.<!DEBUG_INFO_MISSING_UNRESOLVED!>foo19<!>()
 }

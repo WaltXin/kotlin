@@ -180,10 +180,19 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
     private fun simplifyLowerConstraint(typeVariable: KotlinTypeMarker, subType: KotlinTypeMarker): Boolean {
         val lowerConstraint = when (typeVariable) {
             is SimpleTypeMarker ->
-                // Foo <: T or
-                // Foo <: T? -- Foo!! <: T
+                /*
+                 * Foo <: T -- Foo <: T
+                 * Foo <: T? (T is contained in invariant positions of other constraints) -- Foo <: T
+                 *      Example:
+                 *          fun <T> foo(x: T?, y: Inv<T>) {}
+                 *          fun <K> main(z: K) { foo(z, Inv()) }
+                 * Foo <: T? (T isn't contained in there) -- Foo!! <: T
+                 *      Example:
+                 *          fun <T> foo(x: T?) {}
+                 *          fun <K> main(z: K) { foo(z) }
+                 */
                 if (typeVariable.isMarkedNullable()) {
-                    if (typeVariable is NullableSimpleType && typeVariable.invPositions) {
+                    if (typeVariable is NullableSimpleType && typeVariable.isContainedInInvPositionsWithinConstraintSystem) {
                         subType.withNullability(false)
                     } else {
                         subType.makeDefinitelyNotNullOrNotNull()

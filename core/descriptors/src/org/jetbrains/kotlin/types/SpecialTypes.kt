@@ -28,7 +28,7 @@ import org.jetbrains.kotlin.types.refinement.TypeRefinement
 import org.jetbrains.kotlin.types.typeUtil.canHaveUndefinedNullability
 
 abstract class DelegatingSimpleType : SimpleType() {
-    protected abstract val delegate: SimpleType
+    abstract val delegate: SimpleType
 
     override val annotations: Annotations get() = delegate.annotations
     override val constructor: TypeConstructor get() = delegate.constructor

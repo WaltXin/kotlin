@@ -41,7 +41,7 @@ public class TypeUtils {
 
         @NotNull
         @Override
-        protected SimpleType getDelegate() {
+        public SimpleType getDelegate() {
             throw new IllegalStateException(name);
         }
 

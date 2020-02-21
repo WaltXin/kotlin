@@ -297,15 +297,15 @@ fun isContainedInInvPositionsInsideSignature(descriptor: CallableDescriptor, che
             isContainedInInvPositionsAmongArguments(descriptor.returnType, checkingType)
 
 /*
- * checkingType = T, declaration = `fun <T, K: T, L: K> foo() {}` => K, L
  * checkingType = T, declaration = `fun <T, K: T, L: T> foo() {}` => K, L
+ * checkingType = T, declaration = `fun <T, K: T, L: K> foo() {}` => K, L
  */
 private fun getDependentTypeParameters(
     typeParameters: List<TypeParameterDescriptor>,
     checkingType: TypeConstructor
 ): List<TypeConstructor>? {
     val dependentTypeParameterConstructors =
-        typeParameters.filter { it.upperBounds.any { it.constructor == checkingType } }.map { it.typeConstructor }
+        typeParameters.filter { it.upperBounds.any { upperBound -> upperBound.constructor == checkingType } }.map { it.typeConstructor }
 
     if (dependentTypeParameterConstructors.isEmpty()) return null
 
@@ -313,7 +313,10 @@ private fun getDependentTypeParameters(
             dependentTypeParameterConstructors.mapNotNull { getDependentTypeParameters(typeParameters, it) }.flatten()
 }
 
-// checkingType = T, declaration = `fun <K, T: K> foo() {}` => K
+/*
+ * checkingType = T, declaration = `fun <K, T: K> foo() {}` => K
+ * checkingType = T, declaration = `fun <O, D: T, M, S: M, K: S, T: K> foo() {}` => K, S, M
+ */
 private fun getDependingOnTypeParameters(
     typeParameters: List<TypeParameterDescriptor>,
     checkingType: TypeConstructor
@@ -328,7 +331,7 @@ private fun getDependingOnTypeParameters(
     return dependentTypeParameterConstructorsOnDepth + dependentTypeParameterConstructors
 }
 
-fun isContainedInInvPositions(checkingType: TypeConstructor?, declarationDescriptor: DeclarationDescriptor?): Boolean {
+private fun isContainedInInvPositions(checkingType: TypeConstructor?, declarationDescriptor: DeclarationDescriptor?): Boolean {
     if (checkingType == null || declarationDescriptor !is CallableDescriptor)
         return false
 
@@ -341,6 +344,12 @@ fun isContainedInInvPositions(checkingType: TypeConstructor?, declarationDescrip
             dependentTypeParameters?.any { isContainedInInvPositionsInsideSignature(declarationDescriptor, it) } == true
 }
 
+private fun NullableSimpleType.makeTypeContainedInInvPositions() =
+    NullableSimpleType(
+        delegate,
+        isContainedInInvPositionsWithinConstraintSystem = true
+    )
+
 private fun KotlinResolutionCandidate.resolveKotlinArgument(
     argument: KotlinCallArgument,
     candidateParameter: ParameterDescriptor?,
@@ -349,14 +358,12 @@ private fun KotlinResolutionCandidate.resolveKotlinArgument(
     val expectedType = candidateParameter?.run {
         val preparedType = prepareExpectedType(argument, this)
 
-        val s = if (preparedType is NullableSimpleType &&
+        if (preparedType is NullableSimpleType &&
             preparedType.constructor is TypeVariableTypeConstructor &&
             isContainedInInvPositions(returnType?.constructor, containingDeclaration)
         ) {
-            preparedType.makeWithInvPosition()
+            preparedType.makeTypeContainedInInvPositions()
         } else preparedType
-
-        s
     }
 
     val convertedArgument = if (expectedType != null && shouldRunConversionForConstants(expectedType)) {
