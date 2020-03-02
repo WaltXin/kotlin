@@ -2,7 +2,7 @@
 
 class Inv<T>(val x: T?)
 
-fun <K> create(y: K) = Inv(y)
+fun <K> create(y: K) = <!DEBUG_INFO_EXPRESSION_TYPE("Inv<K>")!>Inv(y)<!>
 fun <K> createPrivate(y: K) = Inv(y)
 
 fun takeInvInt(i: Inv<Int>) {}
@@ -59,68 +59,68 @@ fun <K> Bar<K>.foo20(): K = null <!UNCHECKED_CAST!>as K<!>
 
 fun <L> main(x: L?, y: L) {
     // invariant
-    val x00 = foo0(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-    val x01 = foo0(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+    val x00 = foo0(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+    val x01 = foo0(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
 
     // nested invariant
-    val x10 = foo1(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
-    val x11 = foo1(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
+    val x10 = foo1(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+    val x11 = foo1(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
 
     // definitely not null type in arguemnts
     if (x != null && y != null) {
-        val x12 = foo1(<!DEBUG_INFO_EXPRESSION_TYPE("L!! & L?")!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<out Bar<L>>")!>Foo(Bar())<!>)
-        val x13 = foo1(<!DEBUG_INFO_EXPRESSION_TYPE("L & L!!")!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<out Bar<L>>")!>Foo(Bar())<!>)
+        val x12 = foo1(<!DEBUG_INFO_EXPRESSION_TYPE("L!! & L?")!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+        val x13 = foo1(<!DEBUG_INFO_EXPRESSION_TYPE("L & L!!")!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
     }
 
     // with dependent type parameter
-    val x20 = foo2(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
-    val x21 = foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
+    val x20 = foo2(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+    val x21 = foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
 
     // with inversely dependent type parameter
-    val x30 = foo3(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
-    val x31 = foo3(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
+    val x30 = foo3(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+    val x31 = foo3(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
 
     // use site convariant (OK in OI)
-    val x40 = foo4(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<out L!!>>")!>Foo(<!TYPE_MISMATCH("Bar<out L!!>", "Bar<L>"), TYPE_MISMATCH("Bar<out L!!>", "Bar<L>")!>Bar()<!>)<!>)
-    val x41 = foo4(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<out L!!>>")!>Foo(<!TYPE_MISMATCH("Bar<out L!!>", "Bar<L>"), TYPE_MISMATCH("Bar<out L!!>", "Bar<L>")!>Bar()<!>)<!>)
+    val x40 = foo4(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<out L!!>>")!>Foo(Bar())<!>)
+    val x41 = foo4(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<out L!!>>")!>Foo(Bar())<!>)
 
     // use site contravariant
-    val x50 = foo5(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-    val x51 = foo5(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+    val x50 = foo5(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+    val x51 = foo5(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
 
     // declaration site convariant
-    val x60 = foo6(x, <!DEBUG_INFO_EXPRESSION_TYPE("OutBar<L>")!>OutBar()<!>)
-    val x61 = foo6(y, <!DEBUG_INFO_EXPRESSION_TYPE("OutBar<L>")!>OutBar()<!>)
+    val x60 = foo6(x, <!DEBUG_INFO_EXPRESSION_TYPE("OutBar<L!!>")!>OutBar()<!>)
+    val x61 = foo6(y, <!DEBUG_INFO_EXPRESSION_TYPE("OutBar<L!!>")!>OutBar()<!>)
 
     // declaration site contravariant
-    val x70 = foo7(x, <!DEBUG_INFO_EXPRESSION_TYPE("InBar<L>")!>InBar()<!>)
-    val x71 = foo7(y, <!DEBUG_INFO_EXPRESSION_TYPE("InBar<L>")!>InBar()<!>)
+    val x70 = foo7(x, <!DEBUG_INFO_EXPRESSION_TYPE("InBar<L!!>")!>InBar()<!>)
+    val x71 = foo7(y, <!DEBUG_INFO_EXPRESSION_TYPE("InBar<L!!>")!>InBar()<!>)
 
     // with deeply dependent type parameter
-    val x80 = foo8(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
-    val x81 = foo8(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
+    val x80 = foo8(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+    val x81 = foo8(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
 
     // with deeply and inversely dependent type parameter
-    val x90 = foo9(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
-    val x91 = foo9(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>)
+    val x90 = foo9(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
+    val x91 = foo9(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>)
 
     // with complex deeply dependent type parameters
-    val x100 = foo10(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-    val x101 = foo10(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+    val x100 = foo10(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+    val x101 = foo10(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
 
     // with complex deeply and inversely dependent type parameters
-    val x110 = foo11(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-    val x111 = foo11(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+    val x110 = foo11(x, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+    val x111 = foo11(y, <!DEBUG_INFO_EXPRESSION_TYPE("Foo<Bar<L!!>>")!>Foo(Bar())<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
 
     // definitely not null type in arguemnts and not-null upper bound (it doens't work in OI)
     if (x != null && y != null) {
-        val x120 = foo12(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-        val x121 = foo12(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+        val x120 = foo12(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+        val x121 = foo12(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
     }
 
-    // not-null upper bound (it doens't work in OI, and worked before the fix)
-    val x122 = foo12(<!TYPE_MISMATCH!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>"), TYPE_MISMATCH, TYPE_MISMATCH!>Bar()<!>)
-    val x123 = foo12(<!TYPE_MISMATCH!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>"), TYPE_MISMATCH, TYPE_MISMATCH!>Bar()<!>)
+    // not-null upper bound (it doens't work in OI)
+    val x122 = foo12(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+    val x123 = foo12(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
 
     // with type parameter through class
     val x132 = Foo13(x).foo1(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L?>")!>Bar()<!>)
@@ -128,12 +128,12 @@ fun <L> main(x: L?, y: L) {
     val x134 = Foo13(y).foo1(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     val x135 = Foo13(y).foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     if (x != null) {
-        val x136 = Foo13(<!DEBUG_INFO_SMARTCAST!>x<!>).foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+        val x136 = Foo13(<!DEBUG_INFO_SMARTCAST!>x<!>).foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
         val x137 = Foo13(y).foo2(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     }
     if (y != null) {
         val x138 = Foo13(x).foo2(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L?>")!>Bar()<!>)
-        val x139 = Foo13(<!DEBUG_INFO_SMARTCAST!>y<!>).foo2(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+        val x139 = Foo13(<!DEBUG_INFO_SMARTCAST!>y<!>).foo2(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
     }
 
     // simple type
@@ -152,8 +152,8 @@ fun <L> main(x: L?, y: L) {
     val x161 = foo16(x, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     val x162 = foo16(y, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
     if (x != null && y != null) {
-        val x163 = foo16(<!DEBUG_INFO_SMARTCAST!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
-        val x164 = foo16(<!DEBUG_INFO_SMARTCAST!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L>")!>Bar()<!>)
+        val x163 = foo16(<!DEBUG_INFO_SMARTCAST!>x<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
+        val x164 = foo16(<!DEBUG_INFO_SMARTCAST!>y<!>, <!DEBUG_INFO_EXPRESSION_TYPE("Bar<L!!>")!>Bar()<!>)
     }
 
     // generic in return position

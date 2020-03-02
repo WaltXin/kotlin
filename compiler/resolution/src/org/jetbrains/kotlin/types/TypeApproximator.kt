@@ -92,7 +92,6 @@ open class TypeApproximatorConfiguration {
     object FinalApproximationAfterResolutionAndInference :
         TypeApproximatorConfiguration.AbstractCapturedTypesApproximation(FROM_EXPRESSION) {
         override val integerLiteralType: Boolean get() = true
-        override val definitelyNotNullTypeInInvariantPosition: Boolean get() = false
     }
 
     object IntegerLiteralsTypesApproximation : TypeApproximatorConfiguration.AllFlexibleSameValue() {

@@ -1,5 +1,5 @@
 fun <S : Any> foo(x: Array<out S?>, y: Array<in S?>) {
-    val xo = outA(x)
+    val xo = <!DEBUG_INFO_EXPRESSION_TYPE("kotlin.Array<S!!>")!>outA(x)<!>
     val yo = inA(y)
 
     var <!ASSIGNED_BUT_NEVER_ACCESSED_VARIABLE!>f<!>: Array<S> = xo

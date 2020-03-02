@@ -220,6 +220,7 @@ enum class KotlinCallKind(vararg resolutionPart: ResolutionPart) {
         MapArguments,
         ArgumentsToCandidateParameterDescriptor,
         CreateFreshVariablesSubstitutor,
+        CollectionTypeVariableUsagesInfo,
         CheckExplicitReceiverKindConsistency,
         CheckReceivers,
         CheckArgumentsInParenthesis,

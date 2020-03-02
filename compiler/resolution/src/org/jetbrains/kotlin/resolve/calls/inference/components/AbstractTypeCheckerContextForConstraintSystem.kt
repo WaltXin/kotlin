@@ -5,10 +5,10 @@
 
 package org.jetbrains.kotlin.resolve.calls.inference.components
 
+import org.jetbrains.kotlin.resolve.calls.inference.model.TypeVariableTypeConstructor
 import org.jetbrains.kotlin.types.AbstractNullabilityChecker
 import org.jetbrains.kotlin.types.AbstractTypeChecker
 import org.jetbrains.kotlin.types.AbstractTypeCheckerContext
-import org.jetbrains.kotlin.types.NullableSimpleType
 import org.jetbrains.kotlin.types.model.*
 
 abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheckerContext(), TypeSystemInferenceExtensionContext {
@@ -192,7 +192,8 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
                  *          fun <K> main(z: K) { foo(z) }
                  */
                 if (typeVariable.isMarkedNullable()) {
-                    if (typeVariable is NullableSimpleType && typeVariable.isContainedInInvPositionsWithinConstraintSystem) {
+                    val typeVariableTypeConstructor = typeVariable.typeConstructor()
+                    if (typeVariableTypeConstructor is TypeVariableTypeConstructor && typeVariableTypeConstructor.usagesInfo?.isContainedInInvPositions == true) {
                         subType.withNullability(false)
                     } else {
                         subType.makeDefinitelyNotNullOrNotNull()
@@ -297,7 +298,9 @@ abstract class AbstractTypeCheckerContextForConstraintSystem : AbstractTypeCheck
 //      Previously we thought that if `Any` isn't a subtype of S => T <: S, which is wrong, now we use weaker upper constraint
 //      TODO: rethink, maybe we should take nullability into account somewhere else
         if (notTypeVariables.any { AbstractNullabilityChecker.isSubtypeOfAny(this as TypeCheckerProviderContext, it) }) {
-            return typeVariables.all { simplifyUpperConstraint(it, superType.withNullability(true)) }
+            return typeVariables.all {
+                simplifyUpperConstraint(it, superType.withNullability(true))
+            }
         }
 
         return typeVariables.all { simplifyUpperConstraint(it, superType) }
