@@ -31,9 +31,24 @@ class KlibBasedMppIT : BaseGradleIT() {
     }
 
     @Test
+    fun testPublishingAndConsumptionWithEmptySourceSet() = testBuildWithDependency {
+        // KT-36674
+        projectDir.resolve("$dependencyModuleName/src/$hostSpecificSourceSet").run {
+            assertTrue { isDirectory }
+            deleteRecursively()
+        }
+        publishProjectDepAndAddDependency(validateHostSpecificPublication = false)
+    }
+
+    @Test
     fun testBuildWithPublishedDependency() = testBuildWithDependency {
+        publishProjectDepAndAddDependency(validateHostSpecificPublication = true)
+    }
+
+    private fun Project.publishProjectDepAndAddDependency(validateHostSpecificPublication: Boolean) {
         build(":$dependencyModuleName:publish") {
             assertSuccessful()
+            if (validateHostSpecificPublication)
             checkPublishedHostSpecificMetadata(this@build)
         }
 
